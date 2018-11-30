@@ -1,4 +1,4 @@
-use ocl::builders::KernelBuilder;
+use ocl;
 use ocl::{Buffer, Context, Device, Kernel, Platform, Program, Queue, SpatialDims};
 use std::time::SystemTime;
 
@@ -85,7 +85,7 @@ impl Trimmer {
         })
     }
 
-    pub fn run(self, k: &[u64; 4]) -> ocl::Result<Vec<u32>> {
+    pub fn run(&self, k: &[u64; 4]) -> ocl::Result<Vec<u32>> {
         let m1 = SystemTime::now();
         let mut current_mode = Mode::SetCnt;
         let mut current_uorv: u32 = 0;
@@ -150,7 +150,11 @@ impl Trimmer {
         let m2 = SystemTime::now();
         println!("Trimming {:?}", m2.duration_since(m1).unwrap());
         println!("Trimmed to {} edges", self.res_buf[1]);
-        Ok(self.res_buf.clone())
+        let ret = self.res_buf.clone();
+        self.edges.cmd().fill(0xFFFFFFFF, None).enq()?;
+        self.result.cmd().fill(0, None).enq()?;
+        self.q.finish()?;
+        Ok(ret)
     }
 }
 

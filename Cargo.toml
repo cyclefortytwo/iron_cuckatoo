@@ -1,0 +1,7 @@
+[package]
+name = "iron_cuckatoo"
+version = "0.1.0"
+
+[dependencies]
+ocl = "0.19"
+hashbrown = "0.1"
